@@ -32,7 +32,7 @@ public class BlackJackActivity extends Activity
         setContentView(R.layout.main);
         
         
-        cards = (TableRow) findViewById( R.id.cards );
+        cards = (TableRow) findViewById( R.id.dealerCards );
         
         Deck deck = new Deck();
         

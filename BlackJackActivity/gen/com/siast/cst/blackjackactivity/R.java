@@ -78,7 +78,13 @@ public final class R {
         public static final int ts=0x7f020035;
     }
     public static final class id {
-        public static final int cards=0x7f060000;
+        public static final int dealButton=0x7f060001;
+        public static final int dealerCards=0x7f060000;
+        public static final int hitButton=0x7f060005;
+        public static final int playerCards=0x7f060004;
+        public static final int potField=0x7f060003;
+        public static final int potLabel=0x7f060002;
+        public static final int stayButton=0x7f060006;
     }
     public static final class layout {
         public static final int main=0x7f030000;
