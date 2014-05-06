@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BlackJack</string>
+    <string name="welcome">Welcome to CST Blackjack!</string>
+    <string name="dealer">Dealer</string>
+    <string name="dealButton">Deal</string>
+    <string name="playerPot">Player Pot: </string>
+    <string name="hitButton">Hit</string>
+    <string name="stayButton">Stay</string>
+
+</resources>
