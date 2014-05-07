@@ -1,4 +1,4 @@
-cosc190as1
+cosc195as1
 ==========
 
-COSC190 AS 1
+COSC195 AS 1
