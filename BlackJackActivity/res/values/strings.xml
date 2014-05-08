@@ -8,5 +8,6 @@
     <string name="playerPot">Player Pot: </string>
     <string name="hitButton">Hit</string>
     <string name="stayButton">Stay</string>
+    <string name="newGameText">New Game</string>
 
 </resources>
