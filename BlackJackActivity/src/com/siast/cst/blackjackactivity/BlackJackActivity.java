@@ -23,8 +23,8 @@ public class BlackJackActivity extends Activity
 	private int pot;			  // The Player's money
 	private int dealerScore;      // The Dealer's Score
 	private int playerScore;	  // The Player's Score
-	private Card playerHiddenCard; // The face-down card for the player
-	private Card dealerHiddenCard; // The face-down card for the dealer
+	private Player player; 		  // The human player
+	private Player dealer;		  // The computer player
 	private Button dealButton;
 	private Button hitButton;
 	private Button stayButton;
@@ -49,31 +49,11 @@ public class BlackJackActivity extends Activity
         hitButton = (Button) findViewById(R.id.hitButton);
         stayButton = (Button) findViewById(R.id.stayButton);
         potField = (EditText) findViewById(R.id.potField);
+        player = new Player();
+        dealer = new Player();
         
         // Initialize game elements
-        resetThings("a");
-        
-        //Create an image View with a card and add to the UI
-        
-//        Card card1 = deck.getNextCard();
-//        Card card2 = deck.getNextCard();
-//        
-//        ImageView iv = new ImageView( this );
-//        iv.setImageResource( card1.getDrawableId() );
-//        
-//        dealerSpace.addView( iv );
-//        
-//        iv = new ImageView( this );
-//        iv.setImageResource( card2.getDrawableId() );
-//        
-//        dealerSpace.addView( iv );
-//        
-//        //Now add card back
-//        iv = new ImageView( this );
-//        iv.setImageResource( R.drawable.b );
-//        
-//        dealerSpace.addView( iv );
-          
+        resetThings("a");          
     }
     
     /**
@@ -92,8 +72,8 @@ public class BlackJackActivity extends Activity
             playerScore = 0;
             dealerSpace.removeAllViews();
             playerSpace.removeAllViews();
-            Card playerHiddenCard = null;
-        	Card dealerHiddenCard = null;
+        	player.removeCards();
+        	dealer.removeCards();
         	
         	// UI elements
         	hitButton.setEnabled(false);
@@ -106,8 +86,14 @@ public class BlackJackActivity extends Activity
             playerScore = 0;
             dealerSpace.removeAllViews();
             playerSpace.removeAllViews();
-            Card playerHiddenCard = null;
-        	Card dealerHiddenCard = null;
+            for (Card c: player.removeCards())
+            {
+            	deck.addToDiscard(c);
+            }
+            for (Card c: dealer.removeCards())
+            {
+            	deck.addToDiscard(c);
+            }
     	}
     }
     
@@ -119,22 +105,144 @@ public class BlackJackActivity extends Activity
     		newGameSetup();
     	}
     	
+    	resetThings("d");
     	dealCards();
+    	pot = pot - BET_AMOUNT;
+    	potField.setText("$" + pot);
     	dealButton.setEnabled(false);
     	dealButton.setText(R.string.dealButton);
     	hitButton.setEnabled(true);
     	stayButton.setEnabled(true);
     }
 
-	private void dealCards() {
-		// TODO Auto-generated method stub
-		
+	private void dealCards() 
+	{
+		dealCardToPlayer(player, true, false);
+		dealCardToPlayer(dealer, false, true);
+		dealCardToPlayer(player, true, false);
+		dealCardToPlayer(dealer, true, true);
 	}
 
 	private void newGameSetup() 
 	{
-		// TODO Auto-generated method stub
+		resetThings("a");
+		pot = POT_STARTING_AMOUNT;
 		
 	}
-    
+	
+	private void dealCardToPlayer(Player player, boolean faceUp, boolean dealer)
+	{
+		Card newCard = deck.getNextCard();
+		player.addCard(newCard);
+		
+		ImageView iv = new ImageView( this );
+		
+		if (faceUp)
+		{
+			iv.setImageResource( newCard.getDrawableId() );
+		}
+		else
+		{
+			iv.setImageResource(R.drawable.b);
+		}
+        
+		if (dealer)
+		{
+	        dealerSpace.addView(iv);
+		}
+		else
+		{
+			playerSpace.addView(iv);
+		}
+	}
+	
+	
+	
+	public void hitButtonPressed(View view)
+	{
+		dealCardToPlayer(player, true, false);
+		if(checkBroke(player))
+		{
+			endOfGame("l");
+		}
+		else
+		{
+			if (dealer.getScore() < 17)
+			{
+				dealCardToPlayer(dealer, true, true);
+				if (checkBroke(dealer))
+				{
+					endOfGame("w");
+				}
+			}
+		}
+	}
+	
+	private boolean checkBroke(Player player) 
+	{
+		boolean result = false;
+		
+		if (player.getScore() > BLACKJACK)
+		{
+			result = true;
+		}
+		
+		return result;
+	}
+
+	private void endOfGame(String endType) 
+	{
+		if (endType.equals("w"))
+		{
+			Toast.makeText(this, "You won! Your score: " + player.getScore() + ", "
+						   + "Dealer Score: " + dealer.getScore() + ".", Toast.LENGTH_LONG).show();
+			pot = pot + (BET_AMOUNT * 2);
+		}
+		else if (endType.equals("l"))
+		{
+			Toast.makeText(this, "You lost! Your score: " + player.getScore() + ", "
+					   + "Dealer Score: " + dealer.getScore() + ".", Toast.LENGTH_LONG).show();
+		}
+		else
+		{
+			Toast.makeText(this, "You tied! Your score: " + player.getScore() + ", "
+					   + "Dealer Score: " + dealer.getScore() + ".", Toast.LENGTH_LONG).show();
+			pot = pot + BET_AMOUNT;
+		}
+		
+		dealButton.setEnabled(true);
+		hitButton.setEnabled(false);
+		stayButton.setEnabled(false);
+		
+		if (pot == 0)
+		{
+			dealButton.setText(R.string.newGameText);
+			Toast.makeText(this, "You are out of money. Press new game to start again!", Toast.LENGTH_LONG).show();
+		}
+		potField.setText("$" + pot);
+	}
+
+	public void stayButtonPressed(View view)
+	{
+		while (dealer.getScore() < 17)
+		{
+			dealCardToPlayer(dealer, true, true);
+		}
+		if (checkBroke(dealer))
+		{
+			endOfGame("w");
+		}
+		else if (player.getScore() > dealer.getScore())
+		{
+			endOfGame("w");
+		}
+		else if (player.getScore() < dealer.getScore())
+		{
+			endOfGame("l");
+		}
+		else
+		{
+			endOfGame("t");
+		}
+	}
 }

@@ -28,9 +28,9 @@
 		    android:id="@+id/dealButton"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
-		    android:text="@string/dealButton" 
 		    android:layout_gravity="center_horizontal"
-		    android:onClick="dealButtonPressed"/>
+		    android:onClick="dealButtonPressed"
+		    android:text="@string/dealButton" />
 
 		<TextView
 		    android:id="@+id/potLabel"
@@ -43,7 +43,7 @@
 
 		<EditText
 		    android:id="@+id/potField"
-		    android:layout_width="60dp"
+		    android:layout_width="90dp"
 		    android:layout_height="wrap_content"
 		    android:layout_gravity="center_horizontal"
 		    android:clickable="false"
@@ -78,14 +78,16 @@
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
 		    android:layout_gravity="center_horizontal"
-		    android:text="@string/hitButton" />
+		    android:text="@string/hitButton"
+		    android:onClick="hitButtonPressed" />
 
 		<Button
 		    android:id="@+id/stayButton"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
 		    android:layout_gravity="center_horizontal"
-		    android:text="@string/stayButton" />
+		    android:text="@string/stayButton"
+		    android:onClick="stayButtonPressed" />
 
 	</LinearLayout>
 

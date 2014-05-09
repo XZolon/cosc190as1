@@ -19,12 +19,23 @@ public class Player
 	
 	public int getScore()
 	{
-		//TODO deal with soft ace
 		int score = 0;
+		int aces = 0;
 		for( Card c : cards )
 		{
 			score += c.getValue();
+			if (c.getValue() == 11)
+			{
+				aces += 1;
+			}
 		}
+		
+		while (score > 21 && aces > 0)
+		{
+			score -= 10;
+			aces -= 1;
+		}
+		
 		return score;
 	}
 	
