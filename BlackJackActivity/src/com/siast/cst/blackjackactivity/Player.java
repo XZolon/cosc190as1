@@ -17,6 +17,8 @@ public class Player
 		cards.add( c );
 	}
 	
+	
+	// NOTE: Modified to include Soft Ace functionality
 	public int getScore()
 	{
 		int score = 0;

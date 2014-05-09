@@ -1,3 +1,9 @@
+/* 
+ * Class: COSC195
+ * Instructors: Rob Miller, Sharon McDonald
+ * Assignment 1: BlackJack
+ * Date: 5/9/2014
+ */
 package com.siast.cst.blackjackactivity;
 
 import java.util.Vector;
@@ -14,26 +20,33 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ *  Purpose: To create the game "Blackjack" as an Android app.
+ *
+ * @author Christopher Stewart CST134
+ * @version 1.0
+ */
+
 public class BlackJackActivity extends Activity
 {
+	
 	// Initial Variables
-	private TableRow dealerSpace; // Area where dealer cards are shown
-	private TableRow playerSpace; // Area where player cards are shown
 	private Deck deck;			  // The deck used in the game
 	private int pot;			  // The Player's money
-	private int dealerScore;      // The Dealer's Score
-	private int playerScore;	  // The Player's Score
 	private Player player; 		  // The human player
 	private Player dealer;		  // The computer player
-	private Button dealButton;
-	private Button hitButton;
-	private Button stayButton;
-	private EditText potField;
 	
-	public final static int BLACKJACK = 21;
-	private static final int DEALER_HOLD = 17;
-	private final static int BET_AMOUNT = 50;
-	private static final int POT_STARTING_AMOUNT = 500;
+	private TableRow dealerSpace; // Area where dealer cards are shown
+	private TableRow playerSpace; // Area where player cards are shown
+	private Button dealButton;	  // The Deal/New Game Button
+	private Button hitButton;	  // The Hit Button
+	private Button stayButton;	  // The Stay Button
+	private EditText potField;	  // The area where the current pot is displayed
+	
+	public final static int BLACKJACK = 21;				// Victory condition
+	private static final int DEALER_HOLD = 17;		    // The value at which the dealer holds
+	private final static int BET_AMOUNT = 50;   		// The amount the player bets per deal
+	private static final int POT_STARTING_AMOUNT = 500; // The amount the player starts with
 	
     /** Called when the activity is first created. */
     @Override
@@ -57,8 +70,10 @@ public class BlackJackActivity extends Activity
     }
     
     /**
+     * Purpose: Used to reset specific attributes of the game, depending on the parameter
+     * 			that is passed into the method. 
      * @param flags: Determines what to reset.
-     * 					a: (All) Resets all to start of game level
+     * 					a: (All) Resets all to start of game state
      * 					d: (Deal) Resets views and scores but not the pot.
      */
     private void resetThings(String flags)
@@ -68,8 +83,6 @@ public class BlackJackActivity extends Activity
     		// Game elements
     		deck = new Deck();
             pot = 0;
-            dealerScore = 0;
-            playerScore = 0;
             dealerSpace.removeAllViews();
             playerSpace.removeAllViews();
         	player.removeCards();
@@ -82,8 +95,6 @@ public class BlackJackActivity extends Activity
     	}
     	else if (flags.contains("d"))
     	{
-            dealerScore = 0;
-            playerScore = 0;
             dealerSpace.removeAllViews();
             playerSpace.removeAllViews();
             for (Card c: player.removeCards())
@@ -97,6 +108,13 @@ public class BlackJackActivity extends Activity
     	}
     }
     
+
+    /**
+     * Purpose: Event handler for when the Deal button is pressed.
+     * 			If the pot is at 0, it treats the button as if it was a "New Game" button
+     * 			If the pot is above 0, it treats the button as if it was a "Deal" button. 
+     * @param view: the view that the action occurred in
+     */
     public void dealButtonPressed(View view)
     {
     	// Check if New Game
@@ -115,6 +133,10 @@ public class BlackJackActivity extends Activity
     	stayButton.setEnabled(true);
     }
 
+
+	/**
+	 * Purpose: Deals the initial two cards to the player and dealer.
+	 */
 	private void dealCards() 
 	{
 		dealCardToPlayer(player, true, false);
@@ -123,6 +145,10 @@ public class BlackJackActivity extends Activity
 		dealCardToPlayer(dealer, true, true);
 	}
 
+	/**
+	 * Purpose: Called at the start of a new game. Resets all game attributes,
+	 * 			then sets the pot to the starting amount.
+	 */
 	private void newGameSetup() 
 	{
 		resetThings("a");
@@ -130,6 +156,14 @@ public class BlackJackActivity extends Activity
 		
 	}
 	
+
+	/**
+	 * Purpose: Used to deal a single card to a player, then display it.
+	 * @param player The player object to give a card to.
+	 * @param faceUp Whether the card should be displayed face up or face down.
+	 * @param dealer Whether the player passed is the dealer or not (Used to determine where
+	 * 				 to display the card)
+	 */
 	private void dealCardToPlayer(Player player, boolean faceUp, boolean dealer)
 	{
 		Card newCard = deck.getNextCard();
@@ -158,6 +192,15 @@ public class BlackJackActivity extends Activity
 	
 	
 	
+	/**
+	 * Purpose: the event handler for the hit button. Passes a card to the player,
+	 * 			then determines if the player busted. If the player did not bust,
+	 * 			it will check to see if the dealer want to take a card. If the
+	 * 			dealer's score is below DEALER_HOLD, the dealer will take a card.
+	 * 			If either player busts when drawing a card, it calls the end of game
+	 * 			method.
+	 * @param view: The view in which the action occurred.
+	 */
 	public void hitButtonPressed(View view)
 	{
 		dealCardToPlayer(player, true, false);
@@ -167,7 +210,7 @@ public class BlackJackActivity extends Activity
 		}
 		else
 		{
-			if (dealer.getScore() < 17)
+			if (dealer.getScore() < DEALER_HOLD)
 			{
 				dealCardToPlayer(dealer, true, true);
 				if (checkBroke(dealer))
@@ -178,6 +221,11 @@ public class BlackJackActivity extends Activity
 		}
 	}
 	
+	/**
+	 * Purpose: Checks to see if a player broke (Their score is above BLACKJACK).
+	 * @param player: The player to check
+	 * @return true if the player broke, false otherwise.
+	 */
 	private boolean checkBroke(Player player) 
 	{
 		boolean result = false;
@@ -190,6 +238,16 @@ public class BlackJackActivity extends Activity
 		return result;
 	}
 
+
+	/**
+	 * Purpose: Performs end of game logic, displaying toasts for win/loss/tie based on what is passed in
+	 * 			as the parameter. If it detects that the pot has reached 0, it changes the text on the 
+	 * 			deal button to the new game string, and toasts to the player that their game is over.
+	 * @param endType A string value containing a single character flag.
+	 * 				"w" = Win
+	 * 				"l" = Loss
+	 * 				"t" = Tie
+	 */
 	private void endOfGame(String endType) 
 	{
 		if (endType.equals("w"))
@@ -222,9 +280,16 @@ public class BlackJackActivity extends Activity
 		potField.setText("$" + pot);
 	}
 
+
+	/**
+	 * Purpose: Stay button event handler. Allows the dealer to continue drawing cards until it reaches 
+	 * 			DEALER_HOLD or busts. Then checks to see which player won, and fires that to the end of game
+	 * 			method.
+	 * @param view
+	 */
 	public void stayButtonPressed(View view)
 	{
-		while (dealer.getScore() < 17)
+		while (dealer.getScore() < DEALER_HOLD)
 		{
 			dealCardToPlayer(dealer, true, true);
 		}
